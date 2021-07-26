@@ -1,0 +1,27 @@
+{
+  "name": "api-nodejs-tdd",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src",
+    "lint": "eslint src/** test/** --fix",
+    "test": "jest",
+    "test:secure": "jest --watchAll --verbose=true"
+  },
+  "devDependencies": {
+    "eslint": "5.10.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "jest": "23.6.0",
+    "supertest": "3.3.0"
+  },
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "consign": "0.1.6",
+    "express": "4.16.4",
+    "knex": "0.15.2",
+    "knex-logger": "^0.1.0",
+    "pg": "7.7.1"
+  }
+}
