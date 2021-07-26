@@ -7,8 +7,12 @@ module.exports = (app) => {
       
       const create = async (req, res) => {
         const result = await app.services.user.save(req.body) //Obs.: mysql não retorna parâmetro ao inserir, somento o postgres
-        if(result.error) return res.status(400).json(result)
-        res.status(201).json(result[0]);
+        
+        if(result.error) { 
+          return res.status(400).json(result)
+        }
+        
+        return res.status(201).json(result[0]);
       };
 
     return { findAll, create }
