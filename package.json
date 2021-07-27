@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node src",
+    "dev": "nodemon src",
     "lint": "eslint src/** test/** --fix",
     "test": "jest",
     "test:secure": "jest --watchAll --verbose=true"
@@ -14,6 +15,7 @@
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "2.14.0",
     "jest": "23.6.0",
+    "nodemon": "^2.0.12",
     "supertest": "3.3.0"
   },
   "dependencies": {
