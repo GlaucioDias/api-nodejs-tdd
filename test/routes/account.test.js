@@ -18,6 +18,7 @@ test('Deve inserir uma conta com sucesso', () => {
         .then((result) => {
             expect(result.status).toBe(201);
             expect(result.body.name).toBe('#Acc 1');
+            expect(result.body).not.toHaveProperty('passwd')
         })
 });
 
@@ -25,9 +26,10 @@ test('Não deve inserir uma conta sem nome', () => {
     return request(app)
         .post(MAIN_ROUTE)
         .send({ user_id: user.id })
-        .then((result) => {
-            expect(result.status).toBe(400);
-            expect(result.body.error).toBe('Nome é um atributo obrigatório');
+        .then((res) => {
+            console.log(res.body)
+            expect(res.status).toBe(400);
+            expect(res.body.error).toBe('Nome é um atributo obrigatório');
         })
 });
 
