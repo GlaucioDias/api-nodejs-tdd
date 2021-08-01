@@ -3,7 +3,7 @@ const bcript = require('bcrypt-nodejs');
 
 module.exports = (app) => {
     const findAll = () => {
-        return app.db('users').select();
+        return app.db('users').select(['id', 'name', 'mail']);
     };
 
     const findOne = (filter = {}) => {
@@ -27,7 +27,7 @@ module.exports = (app) => {
         const newUser = {...user};
 
         newUser.passwd = getPasswdHash(user.passwd);
-        return app.db ('users').insert(newUser, '*');
+        return app.db ('users').insert(newUser, ['id', 'name', 'mail']);
     };
 
     return { findAll, findOne, save };
