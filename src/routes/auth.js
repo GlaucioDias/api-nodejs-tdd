@@ -1,12 +1,14 @@
 const jwt = require('jwt-simple');
 const bcrypt = require('bcrypt-nodejs');
 const ValidationError = require('../errors/validationError');
+const express = require('express');
 
 const secret = 'Segredo!';
 
 module.exports = (app) => {
-    
-    const signin = (req, res, next) => {
+    const router = express.Router();
+
+    router.post('/signin', (req, res, next) => {
         const { mail, passwd } = req.body;
 
         app.services.user.findOne({ mail })
@@ -25,7 +27,17 @@ module.exports = (app) => {
                     throw new ValidationError('Usuário ou senha inválido')
                 }
             }).catch(err => next(err))
-    }
+    });
 
-    return { signin }
+    router.post('/signup', async (req, res, next) => {                
+            try {
+              const result = await app.services.user.save(req.body) //Obs.: mysql não retorna parâmetro ao inserir, somento o postgres
+              return res.status(201).json(result[0]);
+            } catch (error) {
+              return res.status(400).json({ error: error.message });         
+            }
+          
+    }) ;
+
+    return router;
 }
