@@ -2,6 +2,7 @@ const request = require('supertest');
 const jwt = require('jwt-simple');
 
 const app = require('../../src/app');
+const transaction = require('../../src/services/transaction');
 const MAIN_ROUTE = '/v1/transactions'
 let user, user2, accUser, accUser2;
 
@@ -52,8 +53,99 @@ test('Deve inserir uma transação com sucesso', () => {
         .then((res) => {
             expect(res.status).toBe(201);
             expect(res.body.acc_id).toBe(accUser.id);
+            expect(res.body.amount).toBe('100.00')
         });
 });
+
+test('Transações de entrada devem ser positivas', () => {
+    return request(app).post(MAIN_ROUTE)
+        .set('authorization', `bearer ${user.token}`)
+        .send({ description: 'New T', date: new Date(), amount: -100, type: 'I', acc_id: accUser.id })
+        .then((res) => {
+            expect(res.status).toBe(201);
+            expect(res.body.acc_id).toBe(accUser.id);
+            expect(res.body.amount).toBe('100.00')
+        });
+});
+
+test('Transações de saida devem ser negativas', () => {
+    return request(app).post(MAIN_ROUTE)
+        .set('authorization', `bearer ${user.token}`)
+        .send({ description: 'New T', date: new Date(), amount: 100, type: 'O', acc_id: accUser.id })
+        .then((res) => {
+            expect(res.status).toBe(201);
+            expect(res.body.acc_id).toBe(accUser.id);
+            expect(res.body.amount).toBe('-100.00')
+        });
+});
+
+describe('Ao tentar inserir uma transação inválida', () => {
+    // const validTransaction = { description: 'New T', date: new Date(), amount: 100, type: 'I', acc_id: accUser.id }
+
+    let validTransaction;
+
+    beforeAll(() => {
+        validTransaction = { description: 'New T', date: new Date(), amount: 100, type: 'I', acc_id: accUser.id };
+    });
+
+    const testTemplate = (newData, errorMessage) => {
+        return request(app).post(MAIN_ROUTE)
+            .set('authorization', `bearer ${user.token}`)
+            .send({ ...validTransaction, ...newData })
+            .then((res) => {
+                expect(res.status).toBe(400);
+                expect(res.body.error).toBe(errorMessage);
+            });
+    };
+
+    test('Não deve inserir sem descrição', () => testTemplate({ description: null }, 'Descrição é um atributo obrigatório'));
+    test('Não deve inserir sem valor', () => testTemplate({ amount: null }, 'Valor é um atributo obrigatório'));
+    test('Não deve inserir sem data', () => testTemplate({ date: null }, 'Data é um atributo obrigatório'));
+    test('Não deve inserir sem tipo', () => testTemplate({ type: null }, 'Tipo é um atributo obrigatório'));
+    test('Não deve inserir transação com tipo inválido', () => testTemplate({ type: 'A' }, 'Tipo inválido'));
+
+    test.skip('Não deve inserir uma transação sem valor', () => {
+        return request(app).post(MAIN_ROUTE)
+            .set('authorization', `bearer ${user.token}`)
+            .send({ description: 'New T', date: new Date(), type: 'I', acc_id: accUser.id })
+            .then((res) => {
+                expect(res.status).toBe(400);
+                expect(res.body.error).toBe('Valor é um atributo obrigatório');
+            });
+    });
+
+    test.skip('Não deve inserir uma transação sem data', () => {
+        return request(app).post(MAIN_ROUTE)
+            .set('authorization', `bearer ${user.token}`)
+            .send({ description: 'New T', amount: 100, type: 'I', acc_id: accUser.id })
+            .then((res) => {
+                expect(res.status).toBe(400);
+                expect(res.body.error).toBe('Data é um atributo obrigatório');
+            });
+    });
+
+    test.skip('Não deve inserir uma transação sem tipo', () => {
+        return request(app).post(MAIN_ROUTE)
+            .set('authorization', `bearer ${user.token}`)
+            .send({ description: 'New T', date: new Date(), amount: 100, acc_id: accUser.id })
+            .then((res) => {
+                expect(res.status).toBe(400);
+                expect(res.body.error).toBe('Tipo é um atributo obrigatório');
+            });
+    });
+
+    test.skip('Não deve inserir uma transação com tipo inválido', () => {
+        return request(app).post(MAIN_ROUTE)
+            .set('authorization', `bearer ${user.token}`)
+            .send({ description: 'New T', date: new Date(), amount: 100, type: 'A', acc_id: accUser.id })
+            .then((res) => {
+                expect(res.status).toBe(400);
+                expect(res.body.error).toBe('Tipo inválido');
+            });
+    });
+})
+
+
 
 test('Deve retornar uma transação por ID', () => {
     return app.db('transactions')
@@ -64,5 +156,50 @@ test('Deve retornar uma transação por ID', () => {
                 expect(res.status).toBe(200);
                 expect(res.body.id).toBe(transaction[0].id)
                 expect(res.body.description).toBe('T ID');
-            }))
-})
+            }));
+});
+
+test('Deve alterar uma transação', () => {
+    return app.db('transactions')
+        .insert({ description: 'T to update', date: new Date(), amount: 100, type: 'I', acc_id: accUser.id }, ['id'])
+        .then(transaction => request(app).put(`${MAIN_ROUTE}/${transaction[0].id}`)
+            .set('authorization', `bearer ${user.token}`)
+            .send({ description: 'T updated' })
+            .then((res) => {
+                expect(res.status).toBe(200);
+                expect(res.body.description).toBe('T updated');
+            }));
+});
+
+test('Não deve alterar uma transação de outro usuário', () => {
+    return app.db('transactions')
+        .insert({ description: 'T to update', date: new Date(), amount: 100, type: 'I', acc_id: accUser2.id }, ['id'])
+        .then(transaction => request(app).put(`${MAIN_ROUTE}/${transaction[0].id}`)
+            .set('authorization', `bearer ${user.token}`)
+            .then((res) => {
+                expect(res.status).toBe(403);
+                expect(res.body.error).toBe('Este recurso não pertence ao usuário');
+            }));
+});
+
+test('Deve remover uma transação', () => {
+    return app.db('transactions')
+        .insert({ description: 'T to delete', date: new Date(), amount: 100, type: 'I', acc_id: accUser.id }, ['id'])
+        .then(transaction => request(app).delete(`${MAIN_ROUTE}/${transaction[0].id}`)
+            .set('authorization', `bearer ${user.token}`)
+            .then((res) => {
+                expect(res.status).toBe(204);
+            }));
+
+});
+
+test('Não deve remover uma transação de outro usuário', () => {
+    return app.db('transactions')
+        .insert({ description: 'T to delete', date: new Date(), amount: 100, type: 'I', acc_id: accUser2.id }, ['id'])
+        .then(transaction => request(app).delete(`${MAIN_ROUTE}/${transaction[0].id}`)
+            .set('authorization', `bearer ${user.token}`)
+            .then((res) => {
+                expect(res.status).toBe(403);
+                expect(res.body.error).toBe('Este recurso não pertence ao usuário');
+            }));
+});

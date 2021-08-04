@@ -1,3 +1,4 @@
+const validationError = require('../errors/validationError')
 
 module.exports = (app) => {
 
@@ -16,9 +17,33 @@ module.exports = (app) => {
     }
 
     const save = (transaction) => {
+        if(!transaction.description) throw new validationError('Descrição é um atributo obrigatório')
+        if(!transaction.amount) throw new validationError('Valor é um atributo obrigatório')
+        if(!transaction.date) throw new validationError('Data é um atributo obrigatório')
+        if(!transaction.type) throw new validationError('Tipo é um atributo obrigatório')
+        if(!(transaction.type === 'I' || transaction.type === 'O')) throw new validationError('Tipo inválido')
+
+        const newTransaction = { ...transaction }
+        if((transaction.type === 'I' && transaction.amount < 0)
+            || (transaction.type === 'O' && transaction.amount > 0)) {
+                newTransaction.amount *= -1;
+            }
+
         return app.db('transactions')
-            .insert(transaction, '*');
+            .insert(newTransaction, '*');
     };
 
-    return { find, findOne, save }
+    const update = (id, transaction) => {
+        return app.db('transactions')
+            .where({id})
+            .update(transaction, '*');
+    }
+
+    const remove = (id) => {
+        return app.db('transactions')
+            .where({id})
+            .del();
+    }
+
+    return { find, findOne, save, update, remove }
 }
