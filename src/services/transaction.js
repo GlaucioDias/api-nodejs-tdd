@@ -9,5 +9,16 @@ module.exports = (app) => {
             .select()
     }
 
-    return { find }
+    const findOne = (filter) => {
+        return app.db('transactions')
+            .where(filter)
+            .first();
+    }
+
+    const save = (transaction) => {
+        return app.db('transactions')
+            .insert(transaction, '*');
+    };
+
+    return { find, findOne, save }
 }
