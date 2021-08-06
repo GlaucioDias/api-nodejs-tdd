@@ -6,7 +6,7 @@ const MAIN_ROUTE = '/v1/accounts';
 let user;
 let user2;
 
-beforeEach(async () => {
+beforeAll(async () => {
     const result = await app.services.user.save({ name: 'User Account', mail: `${Date.now()}@test.com`, passwd: '123456' })
 
     user = { ...result[0] };
@@ -16,6 +16,7 @@ beforeEach(async () => {
 
     user2 = { ...result2[0] };
 });
+
 
 test('Deve inserir uma conta com sucesso', () => {
     return request(app)
@@ -53,7 +54,9 @@ test('Não deve inserir uma conta de nome duplicado para o mesmo usuário', () =
         })
 });
 
-test('Deve listar apenas as contas do usuário', () => {
+test('Deve listar apenas as contas do usuário', async() => {
+    await app.db('transactions').del();
+    await app.db('accounts').del();
     return app.db('accounts')
         .insert([
             { name: 'Acc user #1', user_id: user.id },
