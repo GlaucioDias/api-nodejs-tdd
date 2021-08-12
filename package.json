@@ -8,7 +8,7 @@
     "dev": "nodemon src",
     "lint": "eslint src/** test/** --fix",
     "test": "jest",
-    "test:secure": "jest --watchAll --verbose=false"
+    "test:secure": "jest --watchAll --verbose=true"
   },
   "devDependencies": {
     "eslint": "5.10.0",

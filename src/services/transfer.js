@@ -40,7 +40,8 @@ module.exports = (app) => {
         amount: transfer.amount * -1,
         type: "O",
         acc_id: transfer.acc_ori_id,
-        transfer_id: transferId,
+        transfer_id: transferId, 
+        status: true,
       },
       {
         description: `Transfer from acc #${transfer.acc_ori_id}`,
@@ -49,6 +50,7 @@ module.exports = (app) => {
         type: "I",
         acc_id: transfer.acc_dest_id,
         transfer_id: transferId,
+        status: true,
       },
     ];
 
