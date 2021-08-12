@@ -7,7 +7,7 @@
     "start": "node src",
     "dev": "nodemon src",
     "lint": "eslint src/** test/** --fix",
-    "test": "jest",
+    "test": "jest --coverage --runInBand --detectOpenHandles --forceExit",
     "test:secure": "jest --watchAll --verbose=true"
   },
   "devDependencies": {
