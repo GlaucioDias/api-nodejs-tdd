@@ -6,8 +6,12 @@ exports.seed = (knex) => {
     .then(() => knex('accounts').del())
     .then(() => knex('users').del())
     .then(() => knex('users').insert([
-      { id: 10000, name: 'User #1', mail: 'user@test.com', passwd: '$2a$10$hFRTAhlqzDn0d4fy6ZjoHuVa/r7abd4D2qRZJ3FKVwv9/.Zh3jt5q' },
-      { id: 10001, name: 'User #2', mail: 'user2@test.com', passwd: '$2a$10$hFRTAhlqzDn0d4fy6ZjoHuVa/r7abd4D2qRZJ3FKVwv9/.Zh3jt5q' },
+      {
+        id: 10000, name: 'User #1', mail: 'user@test.com', passwd: '$2a$10$hFRTAhlqzDn0d4fy6ZjoHuVa/r7abd4D2qRZJ3FKVwv9/.Zh3jt5q',
+      },
+      {
+        id: 10001, name: 'User #2', mail: 'user2@test.com', passwd: '$2a$10$hFRTAhlqzDn0d4fy6ZjoHuVa/r7abd4D2qRZJ3FKVwv9/.Zh3jt5q',
+      },
     ]))
     .then(() => knex('accounts').insert([
       { id: 10000, name: 'AccO #1', user_id: 10000 },
@@ -16,15 +20,25 @@ exports.seed = (knex) => {
       { id: 10003, name: 'AccD #2', user_id: 10001 },
     ]))
     .then(() => knex('transfers').insert([
-      { id: 10000, description: 'Transfer #1', user_id: 10000, acc_ori_id: 10000, acc_dest_id: 10001, amount: 100, date: new Date() },
-      { id: 10001, description: 'Transfer #2', user_id: 10001, acc_ori_id: 10002, acc_dest_id: 10003, amount: 100, date: new Date() },
+      {
+        id: 10000, description: 'Transfer #1', user_id: 10000, acc_ori_id: 10000, acc_dest_id: 10001, amount: 100, date: new Date(),
+      },
+      {
+        id: 10001, description: 'Transfer #2', user_id: 10001, acc_ori_id: 10002, acc_dest_id: 10003, amount: 100, date: new Date(),
+      },
     ]))
     .then(() => knex('transactions').insert([
-      { description: 'Transfer from AccO #1', date: new Date(), amount: 100, type: 'I', acc_id: 10001, transfer_id: 10000 },
-      { description: 'Transfer to AccD #1', date: new Date(), amount: -100, type: 'O', acc_id: 10000, transfer_id: 10000 }, 
-      { description: 'Transfer from AccO #2', date: new Date(), amount: 100, type: 'I', acc_id: 10003, transfer_id: 10001 },
-      { description: 'Transfer to AccD #2', date: new Date(), amount: -100, type: 'O', acc_id: 10002, transfer_id: 10001 }, 
+      {
+        description: 'Transfer from AccO #1', date: new Date(), amount: 100, type: 'I', acc_id: 10001, transfer_id: 10000,
+      },
+      {
+        description: 'Transfer to AccD #1', date: new Date(), amount: -100, type: 'O', acc_id: 10000, transfer_id: 10000,
+      },
+      {
+        description: 'Transfer from AccO #2', date: new Date(), amount: 100, type: 'I', acc_id: 10003, transfer_id: 10001,
+      },
+      {
+        description: 'Transfer to AccD #2', date: new Date(), amount: -100, type: 'O', acc_id: 10002, transfer_id: 10001,
+      },
     ]));
-
 };
-

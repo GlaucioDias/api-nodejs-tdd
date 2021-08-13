@@ -1,7 +1,7 @@
-const environment = process.env.ENVIRONMENT || 'development';
+// const environment = process.env.ENVIRONMENT || 'development';
 
-const config = require('../../knexfile')[environment];
+// const config = require('../../knexfile')[environment];
 
-const db = require('knex')(config);
+// const db = require('knex')(config);
 
-module.exports = db;
+// module.exports = db;

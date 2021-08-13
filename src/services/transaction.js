@@ -1,49 +1,50 @@
-const validationError = require('../errors/validationError')
+const ValidationError = require('../errors/ValidationError');
 
 module.exports = (app) => {
+  const find = (userId, filter = {}) => {
+    return app.db('transactions')
+      .join('accounts', 'accounts.id', 'acc_id')
+      .where(filter)
+      .andWhere('accounts.user_id', '=', userId)
+      .select();
+  };
 
-    const find = (userId, filter = {}) => {
-        return app.db('transactions')
-            .join('accounts', 'accounts.id', 'acc_id')
-            .where(filter)
-            .andWhere('accounts.user_id', '=', userId)
-            .select()
-    }
+  const findOne = (filter) => {
+    return app.db('transactions')
+      .where(filter)
+      .first();
+  };
 
-    const findOne = (filter) => {
-        return app.db('transactions')
-            .where(filter)
-            .first();
-    }
+  const save = (transaction) => {
+    if (!transaction.description) throw new ValidationError('Descrição é um atributo obrigatório');
+    if (!transaction.amount) throw new ValidationError('Valor é um atributo obrigatório');
+    if (!transaction.date) throw new ValidationError('Data é um atributo obrigatório');
+    if (!transaction.type) throw new ValidationError('Tipo é um atributo obrigatório');
+    if (!(transaction.type === 'I' || transaction.type === 'O')) throw new ValidationError('Tipo inválido');
 
-    const save = (transaction) => {
-        if(!transaction.description) throw new validationError('Descrição é um atributo obrigatório')
-        if(!transaction.amount) throw new validationError('Valor é um atributo obrigatório')
-        if(!transaction.date) throw new validationError('Data é um atributo obrigatório')
-        if(!transaction.type) throw new validationError('Tipo é um atributo obrigatório')
-        if(!(transaction.type === 'I' || transaction.type === 'O')) throw new validationError('Tipo inválido')
-
-        const newTransaction = { ...transaction }
-        if((transaction.type === 'I' && transaction.amount < 0)
+    const newTransaction = { ...transaction };
+    if ((transaction.type === 'I' && transaction.amount < 0)
             || (transaction.type === 'O' && transaction.amount > 0)) {
-                newTransaction.amount *= -1;
-            }
-
-        return app.db('transactions')
-            .insert(newTransaction, '*');
-    };
-
-    const update = (id, transaction) => {
-        return app.db('transactions')
-            .where({id})
-            .update(transaction, '*');
+      newTransaction.amount *= -1;
     }
 
-    const remove = (id) => {
-        return app.db('transactions')
-            .where({id})
-            .del();
-    }
+    return app.db('transactions')
+      .insert(newTransaction, '*');
+  };
 
-    return { find, findOne, save, update, remove }
-}
+  const update = (id, transaction) => {
+    return app.db('transactions')
+      .where({ id })
+      .update(transaction, '*');
+  };
+
+  const remove = (id) => {
+    return app.db('transactions')
+      .where({ id })
+      .del();
+  };
+
+  return {
+    find, findOne, save, update, remove,
+  };
+};
