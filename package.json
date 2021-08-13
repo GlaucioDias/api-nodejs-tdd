@@ -10,7 +10,7 @@
     "test": "jest --coverage --runInBand --forceExit",
     "test:secure": "jest --watchAll --verbose=true"
   },
-  "husku": {
+  "husky": {
     "hooks": {
       "pre-commit": "yarn lint && yarn test"
     }
