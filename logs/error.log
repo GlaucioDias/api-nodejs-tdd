@@ -1,0 +1,13 @@
+{
+ "level": "error",
+ "message": "d859464b-700e-4eb1-8e2f-6d4097e16986",
+ "timestamp": "2021-08-13T13:00:29.088Z"
+}
+{
+ "id": "b961d1eb-8868-4610-95a8-c10f7c33826f",
+ "name": "error",
+ "message": "insert into \"accounts\" (\"atrib_inv\", \"name\", \"user_id\") values ($1, $2, $3) returning * - column \"atrib_inv\" of relation \"accounts\" does not exist",
+ "stack": "error: column \"atrib_inv\" of relation \"accounts\" does not exist\n    at Connection.parseE (/home/nxengenharia/projetos/plataformas-de-cursos/udemy/api-nodejs-tdd/node_modules/pg/lib/connection.js:554:11)\n    at Connection.parseMessage (/home/nxengenharia/projetos/plataformas-de-cursos/udemy/api-nodejs-tdd/node_modules/pg/lib/connection.js:379:19)\n    at Socket.<anonymous> (/home/nxengenharia/projetos/plataformas-de-cursos/udemy/api-nodejs-tdd/node_modules/pg/lib/connection.js:119:22)\n    at Socket.emit (events.js:198:13)\n    at addChunk (_stream_readable.js:288:12)\n    at readableAddChunk (_stream_readable.js:269:11)\n    at Socket.Readable.push (_stream_readable.js:224:10)\n    at TCP.onStreamRead [as onread] (internal/stream_base_commons.js:94:17)",
+ "level": "error",
+ "timestamp": "2021-08-13T13:02:42.179Z"
+}
